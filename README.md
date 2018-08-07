@@ -16,6 +16,11 @@ You can see more info [here](https://blog.davidventura.com.ar/iot-house-with-son
 
 Simply run `./server/OTA_sender.py firmware/main.py` to push `main.py` to the sensor and reboot it.
 
+# Sensor data to grafana
+
+This consists of a simple sensor ([temp.py](firmware/temp.py)) that reads from a DHT22 every 60s and publishes temperature and humidity data.
+Then the [mqtt-influx](server/mqtt-influx.py) service is in charge of POSTing that data to InfluxDB.
+
 # Example sensor
 
 The code for a sensor that:
