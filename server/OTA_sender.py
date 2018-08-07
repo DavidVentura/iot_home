@@ -28,6 +28,7 @@ def main(_file, fname=None):
     with conn:
         print("Connected!")
         conn.sendall(content.encode('ascii'))
+    s.close()
 
 if __name__ == '__main__':
     fname = sys.argv[1]
