@@ -18,6 +18,7 @@ def main(_file, fname=None):
     payload = "{hostname}|{port}|{filename}|{hash}".format(hash=sha1, filename=fname, hostname=HOSTNAME, port=PORT)
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind(('', PORT))
     s.settimeout(5)
     s.listen(1)
@@ -28,6 +29,7 @@ def main(_file, fname=None):
     with conn:
         print("Connected!")
         conn.sendall(content.encode('ascii'))
+    print("Finished")
     s.close()
 
 if __name__ == '__main__':
