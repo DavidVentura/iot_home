@@ -17,7 +17,6 @@ class Mqtt:
             j = json.loads(message.payload.decode('ascii'))
         except json.decoder.JSONDecodeError:
             return
-        print(message.topic, j)
         for cb in self.cb_list:
             cb(message.topic, j)
     
