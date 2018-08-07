@@ -8,6 +8,7 @@ WIFI_CONNECTION_TIMEOUT = 10  # seconds
 WIFI_SSID = 'cuevita'
 WIFI_PASSWORD = 'salander'
 PUBLISH_INTERVAL = 60 # seconds
+OTA_TOPIC = b'OTA'
 
 led = Pin(13, Pin.OUT)
 _debounce = {}
@@ -64,14 +65,58 @@ def mqtt_client(CLIENT_ID, MQTT_HOST, callback=None, subtopic=None):
     if callback:
         mqtt.set_callback(callback)
     connect_mqtt(mqtt)
+    mqtt.subscribe(OTA_TOPIC)
     if subtopic:
         mqtt.subscribe(subtopic)
     return mqtt
 
+def OTA_wrapper(callback):
+    def OTA(topic, msg):
+        if topic != OTA_TOPIC:
+            callback(topic, msg)
+            return
+
+        if len(msg) < 40:
+            print("Something wrong with the message")
+            print(msg)
+            return
+
+        import uhashlib
+        import ubinascii
+        import usocket
+        data = msg.decode('ascii').split("|")
+        sockaddr = usocket.getaddrinfo(data[0], int(data[1]))[0][-1]
+        sock = usocket.socket()
+        sock.connect(sockaddr)
+        f = open('tmp', 'wb')
+        _hash = uhashlib.sha1()
+        while True:
+            d = sock.recv(1024)
+            print(len(d))
+            if len(d) == 0:
+                break
+            _hash.update(d)
+            f.write(d)
+        sock.close()
+        f.close()
+        local_hash = ubinascii.hexlify(_hash.digest()).decode('ascii')
+        if local_hash != data[3]:
+            print(data)
+            print(local_hash)
+            return
+
+        import machine
+        import uos
+        print("renaming tmp to %s" % data[2])
+        uos.rename('tmp', data[2])
+        print('restarting')
+        machine.reset()
+    return OTA
+
 def loop(client_id, setup_fn, loop_fn, callback, subtopic):
     global mqtt
     STA = setup_wifi()
-    mqtt = mqtt_client(client_id, MQTT_HOST, callback=callback, subtopic=subtopic)
+    mqtt = mqtt_client(client_id, MQTT_HOST, callback=OTA_wrapper(callback), subtopic=subtopic)
     for f in setup_fn:
         f()
     while True:
