@@ -38,7 +38,7 @@ def connect_wifi(STA):
         while not STA.isconnected() and time.time() < wifi_reconnect_time:
             led.value(not led())
             print("Waiting wifi...")
-            time.sleep_ms(500)
+            time.sleep_ms(1000)
 
         if not STA.isconnected():
             print("Connection FAILED!")
@@ -76,33 +76,16 @@ def OTA_wrapper(callback):
             callback(topic, msg)
             return
 
-        if len(msg) < 40:
+        if len(msg) < 45: # 40 is the length of the sha1
             print("Something wrong with the message")
             print(msg)
             return
 
-        import uhashlib
-        import ubinascii
-        import usocket
         data = msg.decode('ascii').split("|")
-        sockaddr = usocket.getaddrinfo(data[0], int(data[1]))[0][-1]
-        sock = usocket.socket()
-        sock.connect(sockaddr)
-        f = open('tmp', 'wb')
-        _hash = uhashlib.sha1()
-        while True:
-            d = sock.recv(1024)
-            print(len(d))
-            if len(d) == 0:
-                break
-            _hash.update(d)
-            f.write(d)
-        sock.close()
-        f.close()
-        local_hash = ubinascii.hexlify(_hash.digest()).decode('ascii')
-        if local_hash != data[3]:
-            print(data)
-            print(local_hash)
+        print(data)
+        success = receive_ota(data[0], int(data[1]), data[3])
+        # ip, port, hash
+        if not success:
             return
 
         import machine
@@ -112,6 +95,34 @@ def OTA_wrapper(callback):
         print('restarting')
         machine.reset()
     return OTA
+
+def receive_ota(host, port, remote_hash):
+    import uhashlib
+    import ubinascii
+    import usocket
+    sockaddr = usocket.getaddrinfo(host, port)[0][-1]
+    # You need this object even for numeric addresses
+
+    sock = usocket.socket()
+    sock.connect(sockaddr)
+    f = open('tmp', 'wb') # write the streamed data to a file
+    # as we might not have enough memory for the entire thing
+    # also calculate hash while streaming
+    _hash = uhashlib.sha1()
+    while True:
+        d = sock.recv(1024)
+        if len(d) == 0:
+            break
+        _hash.update(d)
+        f.write(d)
+    sock.close()
+    f.close()
+    local_hash = ubinascii.hexlify(_hash.digest()).decode('ascii')
+    if local_hash != remote_hash:
+        print(local_hash)
+        return False
+
+    return True
 
 def loop(client_id, setup_fn, loop_fn, callback, subtopic):
     global mqtt
