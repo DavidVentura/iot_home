@@ -121,7 +121,7 @@ def loop(client_id, setup_fn, loop_fn, callback, subtopic):
         f()
     while True:
         if not STA.isconnected():
-            connect_wifi()
+            connect_wifi(STA)
         for f in loop_fn:
             f()
         time.sleep_ms(200)
