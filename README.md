@@ -11,6 +11,13 @@ You can see more info [here](https://blog.davidventura.com.ar/iot-house-with-son
 * The program flow is inspired by Arduino; setup followed by loop()
     * You have to set up your IRQ handlers during setup
 
+
+# Pushing an OTA update
+
+Simply run `./server/OTA_sender.py firmware/main.py` to push `main.py` to the sensor and reboot it.
+
+# Example sensor
+
 The code for a sensor that:
 * Toggles a GPIO on button press
 * Sets the GPIO state on an incoming MQTT message
