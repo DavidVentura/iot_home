@@ -20,12 +20,17 @@ def main(_file, fname=None):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind(('', PORT))
-    s.settimeout(5)
+    s.settimeout(3)
     s.listen(1)
     
-    print(payload)
+    print("Serving the file %s (as %s) on %s:%s" % (_file, fname, HOSTNAME, PORT))
     publish.single('OTA', payload, hostname='iot')
-    conn, addr = s.accept()
+    try:
+        conn, addr = s.accept()
+    except socket.timeout:
+        print("Timed out!")
+        return
+
     with conn:
         print("Connected!")
         conn.sendall(content.encode('ascii'))
