@@ -15,9 +15,10 @@ def read_dht():
     common.mqtt.publish(TEMPTOPIC, "%.2f" % dht.temperature())
     common.mqtt.publish(HUMTOPIC, "%.2f" % dht.humidity())
 
+def setup():
+    led(1) # Turn off LED, it is inverted
+
 def main():
-    setup_fns = [ lambda: led(1) # Turn off LED, it is inverted
-                ]
-    common.loop(CLIENT_ID, setup_fn=setup_fns, loop_fn=[read_dht], callback=sub_cb, subtopic=SUBTOPIC)
+    common.loop(CLIENT_ID, setup_fn=setup, loop_fn=[read_dht], callback=sub_cb, subtopic=SUBTOPIC)
 
 main()

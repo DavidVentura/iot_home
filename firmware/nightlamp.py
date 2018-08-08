@@ -26,10 +26,10 @@ def sub_cb(topic, msg):
 def handle_button(pin):
     set_pin(relay, not relay())
 
+def setup():
+    button.irq(handler=handle_button, trigger=Pin.IRQ_RISING),
+    led(1) # Turn off LED, it is inverted
 def main():
-    setup_fns = [ lambda: button.irq(handler=handle_button, trigger=Pin.IRQ_RISING),
-                  lambda: led(1) # Turn off LED, it is inverted
-                ]
-    common.loop(CLIENT_ID, setup_fn=setup_fns, loop_fn=[], callback=sub_cb, subtopic=SUBTOPIC)
+    common.loop(CLIENT_ID, setup_fn=setup, loop_fn=[], callback=sub_cb, subtopic=SUBTOPIC)
 
 main()
