@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import argparse
 import hashlib
 import os
 import socket
@@ -8,7 +9,7 @@ import paho.mqtt.publish as publish
 PORT = 1234
 HOSTNAME = socket.gethostname()
 
-def main(_file, fname=None):
+def main(_file, fname, target):
     content = open(_file, 'r', encoding='ascii').read()
     sha1 = hashlib.sha1(content.encode('ascii')).hexdigest()
 
@@ -23,8 +24,9 @@ def main(_file, fname=None):
     s.settimeout(3)
     s.listen(1)
     
-    print("Serving the file %s (as %s) on %s:%s" % (_file, fname, HOSTNAME, PORT))
-    publish.single('OTA', payload, hostname='iot')
+    print("Publishing to %s the file %s (as %s) on %s:%s" % (target, _file, fname, HOSTNAME, PORT))
+    publish.single('%s/OTA' % target, payload, hostname='iot')
+    #publish.single('OTA', payload, hostname='iot')
     try:
         conn, addr = s.accept()
     except socket.timeout:
@@ -38,8 +40,12 @@ def main(_file, fname=None):
     s.close()
 
 if __name__ == '__main__':
-    fname = sys.argv[1]
-    if not os.path.isfile(fname):
+    parser = argparse.ArgumentParser()
+    parser.add_argument("file")
+    parser.add_argument("--as-file", required=False)
+    parser.add_argument("--target", required=True, help="Target CLIENT_ID, case sensitive")
+    args = parser.parse_args()
+    if not os.path.isfile(args.file):
         print("%s doesnt exist / is not afile" % fname)
         sys.exit(1)
-    main(fname)
+    main(args.file, args.as_file, args.target)
