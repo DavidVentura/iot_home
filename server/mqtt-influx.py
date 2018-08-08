@@ -25,8 +25,6 @@ def main():
         pass
 
 def to_influx(topic, value):
-    tstamp = int(time.mktime(datetime.datetime.now().timetuple()))
-    influx_tstamp = tstamp * 1000000000
 
     _type = topic.split('/')[0]
     sensor = topic.split('/')[1]
