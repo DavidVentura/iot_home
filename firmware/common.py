@@ -8,7 +8,7 @@ WIFI_CONNECTION_TIMEOUT = 10  # seconds
 WIFI_SSID = 'cuevita'
 WIFI_PASSWORD = 'salander'
 PUBLISH_INTERVAL = 60 # seconds
-OTA_TOPIC = b'OTA'
+OTA_TOPIC = None
 
 led = Pin(13, Pin.OUT)
 _debounce = {}
@@ -126,6 +126,8 @@ def receive_ota(host, port, remote_hash):
 
 def loop(client_id, setup_fn, loop_fn, callback, subtopic):
     global mqtt
+    global OTA_TOPIC
+    OTA_TOPIC = ("%s/OTA" % client_id).encode('ascii')
     STA = setup_wifi()
     mqtt = mqtt_client(client_id, MQTT_HOST, callback=OTA_wrapper(callback), subtopic=subtopic)
     for f in setup_fn:
