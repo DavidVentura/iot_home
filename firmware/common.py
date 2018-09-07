@@ -1,4 +1,4 @@
-from machine import Pin
+from machine import Pin, reset
 from network import WLAN, STA_IF
 from mqtt import MQTTClient
 import time
@@ -127,15 +127,19 @@ def receive_ota(host, port, remote_hash):
 def loop(client_id, setup_fn, loop_fn, callback, subtopic):
     global mqtt
     global OTA_TOPIC
-    OTA_TOPIC = ("%s/OTA" % client_id).encode('ascii')
-    STA = setup_wifi()
-    mqtt = mqtt_client(client_id, MQTT_HOST, callback=OTA_wrapper(callback), subtopic=subtopic)
-    setup_fn()
-    while True:
-        if not STA.isconnected():
-            connect_wifi(STA)
-        for f in loop_fn:
-            f()
-        time.sleep_ms(200)
-        mqtt.check_msg()
-    mqtt.disconnect()
+    try:
+        OTA_TOPIC = ("%s/OTA" % client_id).encode('ascii')
+        STA = setup_wifi()
+        mqtt = mqtt_client(client_id, MQTT_HOST, callback=OTA_wrapper(callback), subtopic=subtopic)
+        setup_fn()
+        while True:
+            if not STA.isconnected():
+                connect_wifi(STA)
+            for f in loop_fn:
+                f()
+            time.sleep_ms(200)
+            mqtt.check_msg()
+        mqtt.disconnect()
+    catch Exception as e:
+        print(e)
+        reset()
