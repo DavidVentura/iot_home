@@ -8,6 +8,7 @@ You can see more info [here](https://blog.davidventura.com.ar/iot-house-with-son
 * A daemon on a real box converts this to whatever protocol necessary
 * You shouldn't need to write more than ~40 lines of code for your sensor
 * OTA updates included
+* Remote logging (simple messages sent via UDP)
 * The program flow is inspired by Arduino; setup followed by loop()
     * You have to set up your IRQ handlers during setup
 
@@ -46,6 +47,7 @@ def sub_cb(topic, msg):
 @common.debounce(250)
 def handle_button(pin):
     set_pin(relay, not relay())
+    common.log('Someone pressed the button!')
 
 def main():
     setup_fns = [ lambda: button.irq(handler=handle_button, trigger=Pin.IRQ_RISING),
