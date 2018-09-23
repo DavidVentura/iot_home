@@ -2,6 +2,7 @@ from machine import Pin, reset
 from network import WLAN, STA_IF
 from mqtt import MQTTClient
 import time
+import usocket
 
 MQTT_HOST = 'iot'
 WIFI_CONNECTION_TIMEOUT = 10  # seconds
@@ -9,6 +10,8 @@ WIFI_SSID = 'cuevita'
 WIFI_PASSWORD = 'salander'
 PUBLISH_INTERVAL = 60 # seconds
 OTA_TOPIC = None
+CLIENT_ID = "ID_NOT_SET"
+LOGSERVER = '192.168.2.189'
 
 led = Pin(13, Pin.OUT)
 _debounce = {}
@@ -31,18 +34,18 @@ def debounce(interval):
 
 def connect_wifi(STA):
     while not STA.isconnected():
-        print("Connecting to Wi-Fi...")
+        print("LOCAL-Connecting to Wi-Fi...")
         wifi_reconnect_time = time.time() + WIFI_CONNECTION_TIMEOUT
         STA.connect(WIFI_SSID, WIFI_PASSWORD)
 
         while not STA.isconnected() and time.time() < wifi_reconnect_time:
             led.value(not led())
-            print("Waiting wifi...")
+            print("LOCAL-Waiting wifi...")
             time.sleep_ms(1000)
 
         if not STA.isconnected():
-            print("Connection FAILED!")
-    print("Connected!")
+            print("LOCAL-Connection FAILED!")
+    log("Connected!")
 
 def setup_wifi():
     STA = WLAN(STA_IF)
@@ -57,10 +60,10 @@ def connect_mqtt(m):
             return
         except Exception as e:
             led.value(not led())
-            print(e)
+            log(e)
             time.sleep_ms(200)
 
-def mqtt_client(CLIENT_ID, MQTT_HOST, callback=None, subtopic=None):
+def mqtt_client(MQTT_HOST, callback=None, subtopic=None):
     mqtt = MQTTClient(CLIENT_ID, MQTT_HOST)
     if callback:
         mqtt.set_callback(callback)
@@ -77,12 +80,12 @@ def OTA_wrapper(callback):
             return
 
         if len(msg) < 45: # 40 is the length of the sha1
-            print("Something wrong with the message")
-            print(msg)
+            log("Something wrong with the message")
+            log(msg)
             return
 
         data = msg.decode('ascii').split("|")
-        print(data)
+        log(data)
         success = receive_ota(data[0], int(data[1]), data[3])
         # ip, port, hash
         if not success:
@@ -90,16 +93,15 @@ def OTA_wrapper(callback):
 
         import machine
         import uos
-        print("renaming tmp to %s" % data[2])
+        log("renaming tmp to %s" % data[2])
         uos.rename('tmp', data[2])
-        print('restarting')
+        log('restarting')
         machine.reset()
     return OTA
 
 def receive_ota(host, port, remote_hash):
     import uhashlib
     import ubinascii
-    import usocket
     sockaddr = usocket.getaddrinfo(host, port)[0][-1]
     # You need this object even for numeric addresses
 
@@ -119,18 +121,30 @@ def receive_ota(host, port, remote_hash):
     f.close()
     local_hash = ubinascii.hexlify(_hash.digest()).decode('ascii')
     if local_hash != remote_hash:
-        print(local_hash)
+        log(local_hash)
         return False
 
     return True
 
-def loop(client_id, setup_fn, loop_fn, callback, subtopic):
+def log(msg):
+    print(msg)
+    try:
+        s = usocket.socket(usocket.AF_INET, usocket.SOCK_DGRAM)
+        address = (LOGSERVER, 3333)
+        s.connect(address)
+        s.send("%s|%s" % (CLIENT_ID, msg))
+    except Exception as e:
+        print(e)
+
+def loop(_id, setup_fn, loop_fn, callback, subtopic):
     global mqtt
     global OTA_TOPIC
+    global CLIENT_ID
+    CLIENT_ID = _id
     try:
-        OTA_TOPIC = ("%s/OTA" % client_id).encode('ascii')
+        OTA_TOPIC = ("%s/OTA" % CLIENT_ID).encode('ascii')
         STA = setup_wifi()
-        mqtt = mqtt_client(client_id, MQTT_HOST, callback=OTA_wrapper(callback), subtopic=subtopic)
+        mqtt = mqtt_client(MQTT_HOST, callback=OTA_wrapper(callback), subtopic=subtopic)
         setup_fn()
         while True:
             if not STA.isconnected():
@@ -140,6 +154,6 @@ def loop(client_id, setup_fn, loop_fn, callback, subtopic):
             time.sleep_ms(200)
             mqtt.check_msg()
         mqtt.disconnect()
-    catch Exception as e:
-        print(e)
+    except Exception as e:
+        log(e)
         reset()
