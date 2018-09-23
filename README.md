@@ -14,7 +14,7 @@ You can see more info [here](https://blog.davidventura.com.ar/iot-house-with-son
 
 # Pushing an OTA update
 
-Simply run `./server/OTA_sender.py firmware/main.py` to push `main.py` to the sensor and reboot it.
+Simply run `./server/OTA_sender.py --target NIGHTLAMP firmware/main.py` to push `main.py` to the sensor `NIGHTLAMP` and reboot it.
 
 # Sensor data to grafana
 
