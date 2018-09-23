@@ -9,6 +9,13 @@ import paho.mqtt.publish as publish
 PORT = 1234
 HOSTNAME = socket.gethostname()
 
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s.connect(('8.8.8.8', 53))
+localip = s.getsockname()[0]
+s.close()
+
+HOSTNAME = localip # my notebook does not get resolved for some reason
+
 def main(_file, fname, target):
     content = open(_file, 'r', encoding='ascii').read()
     sha1 = hashlib.sha1(content.encode('ascii')).hexdigest()
