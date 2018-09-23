@@ -12,7 +12,7 @@ GRAFANA_URL = "http://grafana.labs:8086/write?db=sensordata"
 def setup():
     host = 'iot'
     port = 1883
-    topics = ["TEMP/TEMPSENSOR", "HUM/TEMPSENSOR", "HUM/NIGHTLAMP2", "TEMP/NIGHTLAMP2", "NIGHTLAMP2/state"]
+    topics = ["TEMP/TEMPSENSOR", "HUM/TEMPSENSOR", "HUM/#", "TEMP/#", "NIGHTLAMP2/state"]
     # CONFIG
     return Mqtt(host, port, topics, [to_influx])
 
@@ -25,6 +25,7 @@ def main():
         pass
 
 def to_influx(topic, value):
+    print(datetime.datetime.now(), topic, value)
 
     _type = topic.split('/')[0]
     sensor = topic.split('/')[1]
