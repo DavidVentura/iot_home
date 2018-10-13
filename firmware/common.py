@@ -145,13 +145,14 @@ def loop(_id, setup_fn, loop_fn, callback, subtopic):
         OTA_TOPIC = ("%s/OTA" % CLIENT_ID).encode('ascii')
         STA = setup_wifi()
         mqtt = mqtt_client(MQTT_HOST, callback=OTA_wrapper(callback), subtopic=subtopic)
-        setup_fn()
+        if setup_fn is not None:
+            setup_fn()
         while True:
             if not STA.isconnected():
                 connect_wifi(STA)
             for f in loop_fn:
                 f()
-            time.sleep_ms(200)
+            time.sleep_ms(100)
             mqtt.check_msg()
         mqtt.disconnect()
     except Exception as e:
