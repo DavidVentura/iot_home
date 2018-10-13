@@ -33,14 +33,14 @@ def sub_cb(topic, msg):
         return
     common.log("Moving curtains %s for %d sec" % (topic, _time))
 
-    set_pin(relay, True)
+    set_pin(relay, False)
     for i in range(0, 10):
         time.sleep_ms(_time*100)
-    set_pin(relay, False)
+    set_pin(relay, True)
 
 def setup():
-    set_pin(relay_down, False)
-    set_pin(relay_up, False)
+    set_pin(relay_down, True)
+    set_pin(relay_up, True)
 
 def main():
     setup()
