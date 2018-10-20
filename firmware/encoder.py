@@ -122,3 +122,6 @@ class Encoder(object):
 
     def reset(self):
         self._value = 0
+
+    def override_value(self, value):
+        self._value = min(self.max_val, max(self.min_val, value))
