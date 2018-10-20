@@ -2,9 +2,9 @@ import common
 from machine import Pin, PWM
 from encoder import Encoder
 
-MAX_STEPS_ENCODER = 30
+MAX_STEPS_ENCODER = 25
 CLIENT_ID = 'LIGHTS'
-SUBTOPIC = b"%s/set" % CLIENT_ID
+SUBTOPIC = b"%s/set/#" % CLIENT_ID
 PUBTOPIC = b"%s/state" % CLIENT_ID
 
 light_pin = Pin(14) # D5
@@ -15,6 +15,7 @@ sw = Pin(5, Pin.IN, Pin.PULL_UP) # d1
 light_intensity = 1
 light_on = True
 
+
 def set_light(on, value):
     light_pwm.duty(on * value)
     if common.mqtt:
@@ -24,7 +25,7 @@ def update_light():
     value =  light_intensity * int(1024/MAX_STEPS_ENCODER)
     set_light(int(light_on), value)
 
-@common.debounce(200)
+@common.debounce(250)
 def btn_callback(p):
     global light_on
     common.log('btn change %s' % p)
@@ -43,10 +44,15 @@ def sub_cb(topic, msg):
     topic = topic.decode('ascii')
     msg = msg.decode('ascii')
     print(topic, msg)
-    if topic == 'INTENSITY':
+    if topic == '%s/set/INTENSITY' % CLIENT_ID:
         light_intensity = int(msg)
-    elif topic == 'STATE':
+        e.override_value(light_intensity)
+        update_light()
+    elif topic == '%s/set/STATE' % CLIENT_ID:
         light_on = bool(msg)
+        update_light()
+    else:
+        common.log("I got %s .. ?" % str(topic, msg))
 
 def setup():
     global light_intensity
@@ -57,8 +63,7 @@ def setup():
     sw.irq(trigger=Pin.IRQ_FALLING, handler=btn_callback)
 
 def main():
-    e = Encoder(4, 0, min_val=1, max_val=MAX_STEPS_ENCODER, callback=rotary_cb) # d2, d3 => order matters for rotation direction
     common.loop(CLIENT_ID, setup_fn=setup, loop_fn=[], callback=sub_cb, subtopic=SUBTOPIC)
 
+e = Encoder(4, 0, min_val=1, max_val=MAX_STEPS_ENCODER, callback=rotary_cb) # d2, d3 => order matters for rotation direction
 main()
-
