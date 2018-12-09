@@ -69,8 +69,12 @@ def mqtt_client(MQTT_HOST, callback=None, subtopic=None):
         mqtt.set_callback(callback)
     connect_mqtt(mqtt)
     mqtt.subscribe(OTA_TOPIC)
-    if subtopic:
-        mqtt.subscribe(subtopic)
+    if subtopic is not None:
+        if type(subtopic) is list:
+            for topic in subtopic:
+                mqtt.subscribe(topic)
+        else:
+            mqtt.subscribe(subtopic)
     return mqtt
 
 def OTA_wrapper(callback):
