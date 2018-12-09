@@ -22,7 +22,7 @@
                 setup_ws();
             };
             function setup_ws() {
-                ws = new WebSocket("ws://david-dotopc.labs:8998");
+                ws = new WebSocket(`ws://{window.location.hostname}:8998`);
                 ws.onmessage = function(ev) {
                     var data = JSON.parse(ev.data);
                     console.log(data);
