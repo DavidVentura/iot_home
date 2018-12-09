@@ -21,7 +21,7 @@ def msg_received(q):
     return wrap
 
 def serve(mqtt_q, ws_q):
-    server = WebsocketServer(8998, host='0.0.0.0', loglevel=logging.INFO)
+    server = WebsocketServer(8998, host='0.0.0.0') #, loglevel=logging.INFO)
     server.set_fn_new_client(new_client)
     server.set_fn_message_received(msg_received(ws_q))
     t = Thread(target=server.run_forever)
