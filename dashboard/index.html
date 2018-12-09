@@ -1,0 +1,145 @@
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            html { margin: 0px; padding: 0px;}
+            body {
+                margin: 0px auto;
+                padding: 20px;
+                width: 80%;
+                max-width: 40em;
+            }
+            .row { padding-bottom: 20px }
+            button { padding: 15px; }
+        </style>
+        <script>
+            var state = {};
+            var ws;
+            var curtain_timer = 0;
+            var status_labels;
+            window.onload = function(e) {
+                status_labels = document.querySelectorAll('span[statuskey]');
+                setup_ws();
+            };
+            function setup_ws() {
+                ws = new WebSocket("ws://david-dotopc.labs:8998");
+                ws.onmessage = function(ev) {
+                    var data = JSON.parse(ev.data);
+                    console.log(data);
+                    Object.assign(state, data);
+                    update_labels(state, status_labels);
+                }
+                ws.onclose = function(e) {
+                    console.log('Got a close on ws!');
+                    setTimeout(setup_ws, 1000);
+                };
+            }
+            function update_labels(state, status_labels) {
+                var labels = {};
+                for (var label of status_labels) {
+                    var key = label.getAttribute('statuskey');
+                    switch(key) {
+                        case 'LIGHTS/state/intensity':
+                            labels[key] = parseInt(parseInt(state[key])/1024*100) + "%";
+                            break
+                        default:
+                            labels[key] = state[key];
+                    }
+                    switch(state[key]) {
+                        case '0':
+                            label.innerText = 'OFF';
+                            break;
+                        case '1':
+                            label.innerText = 'ON';
+                            break;
+                        default:
+                            label.innerText = labels[key];
+                    }
+                }
+            }
+            function send_msg(topic, value) {
+                var obj = {};
+                obj[topic] = value;
+                ws.send(JSON.stringify(obj));
+            }
+            function send_curtain() {
+                if (curtain_timer > 0)
+                    send_msg("ALL_CURTAINS/set/up", curtain_timer);
+                else if (curtain_timer < 0)
+                    send_msg("ALL_CURTAINS/set/down", Math.abs(curtain_timer));
+                set_timer(-curtain_timer);
+            }
+            function set_timer(val) {
+                var curtain_status = document.getElementById('curtain_timer');
+                curtain_timer += val;
+                curtain_timer = Math.min(Math.max(curtain_timer, -20), 20);
+                if (curtain_timer < 0) {
+                    curtain_status.innerText = `Down ${Math.abs(curtain_timer)}s`;
+                } else if (curtain_timer > 0) {
+                    curtain_status.innerText = `Up ${curtain_timer}s`;
+                } else {
+                    curtain_status.innerText = '';
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <div class=row>
+            Curtain: 
+            <div>
+                <button onclick='set_timer(-3)'>Down</button>
+                <button onclick='set_timer(3)'>Up</button>
+                <label id='curtain_timer'></label>
+                <button onclick='send_curtain()'>send</button>
+            </div>
+        </div>
+        <div class=row>
+            Night lamp <span statuskey='NIGHTLAMP/state'>{STATUS}</span>
+            <div>
+            <button onclick='send_msg("NIGHTLAMP/set", 1)'>ON</button>
+            <button onclick='send_msg("NIGHTLAMP/set", 0)'>OFF</button>
+            </div>
+        </div>
+        <div class=row>
+            Christmas light <span statuskey='RFPOWER/state/2'>{STATUS}</span>
+            <div>
+            <button onclick='send_msg("RFPOWER/set/2", 1)'>ON</button>
+            <button onclick='send_msg("RFPOWER/set/2", 0)'>OFF</button>
+            </div>
+        </div>
+
+        <div class=row>
+            Door
+            <button>OPEN</button>
+        </div>
+        <div class=row>
+            Bedroom light 
+            <button>TOGGLE</button>
+        </div>
+        <div class=row>
+            kodi:
+            <button>Cast</button>
+            <button>Stop</button>
+        </div>
+        <!--
+        <div class=row>
+            lights
+            <span statuskey='LIGHTS/state/power'>{CUR}</span>
+            <span statuskey='LIGHTS/state/intensity'>{CUR}</span>
+        </div>
+        -->
+        <div class=row>
+            temp nightlamp
+            <span statuskey='TEMP/NIGHTLAMP'>{CUR}</span>
+        </div>
+        <div class=row>
+            temp outside
+            <span statuskey='TEMP/OUTSIDE'>{CUR}</span>
+        </div>
+
+        <div class=row>
+            last update
+            <span statuskey='timestamp'>{CUR}</span>
+        </div>
+    </body>
+</html>
