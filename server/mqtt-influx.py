@@ -30,11 +30,14 @@ def to_influx(topic, value):
     _type = topic.split('/')[0]
     sensor = topic.split('/')[1]
     _data = '%s sensor="%s",value=%f' % (_type, sensor, float(value))
-    response = requests.post(GRAFANA_URL, data=_data, timeout=2)
-    if not response.ok:
-        print(_data)
-        print(response)
-        print(response.text)
+    try:
+        response = requests.post(GRAFANA_URL, data=_data, timeout=2)
+        if not response.ok:
+            print(_data)
+            print(response)
+            print(response.text)
+    except Exception as e:
+        print(e)
 
     
 if __name__ == '__main__':
