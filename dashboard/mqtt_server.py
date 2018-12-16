@@ -9,22 +9,22 @@ def on_msg_wrapper(q):
     def on_message(client, userdata, message):
         msg = message.payload.decode('ascii')
         topic = message.topic
-        print('> %s: %s' % (topic, msg))
+        print('> %s: %s' % (topic, msg), flush=True)
         q.put((topic, msg))
     return on_message
 
 def serve(mqtt_q, ws_q):
     mqttc = mqtt.Client()
-    print('connecting')
+    print('connecting', flush=True)
     mqttc.connect('iot.labs')
     for topic in topics:
-        print('subscribing to %s' % topic)
+        print('subscribing to %s' % topic, flush=True)
         mqttc.subscribe(topic, qos=0)
     mqttc.on_message = on_msg_wrapper(mqtt_q)
     mqttc.loop_start()
     while True:
         data = ws_q.get()
-        print('mqtt got %s' % data)
+        print('mqtt got %s' % data, flush=True)
         for topic, value in data.items():
             mqttc.publish(topic, value, retain=False)
-    print('finished serving mqtt')
+    print('finished serving mqtt', flush=True)
