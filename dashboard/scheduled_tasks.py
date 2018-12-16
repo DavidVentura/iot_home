@@ -42,7 +42,8 @@ def every(interval):
         def wrapper(*args, **kwargs):
             func(*args, **kwargs)
             scheduler.enter(interval, 1, every(interval)(func), argument=args, kwargs=kwargs)
-            print("Scheduling %s in %s seconds with args: %s and kwargs %s" % (func.__name__, interval, args, kwargs))
+            target_ts = datetime.datetime.fromtimestamp(time.time() + interval).strftime('%Y%m%d-%H%M%S')
+            print("Scheduling %s in %s seconds [at %s] with args: %s and kwargs %s" % (func.__name__, interval, target_ts, args, kwargs))
         return wrapper
     return cdecorator
 
@@ -51,9 +52,14 @@ def schedule_sunset():
     data = buien_data()
     # print(data)
     sunset_ts = data['sunset'].timestamp()
+    if sunset_ts < time.time():
+        sunset_ts += 24*HOUR
+
     args = ('RFPOWER/set/2', '1')
     kwargs = {'hostname': 'iot', 'retain': True}
     scheduler.enterabs(sunset_ts, 1, publish.single, argument=args, kwargs=kwargs)
+    target_ts = datetime.datetime.fromtimestamp(sunset_ts).strftime('%Y%m%d-%H%M%S')
+    print("Scheduling %s at %s with args: %s and kwargs %s" % (publish.single.__name__, target_ts, args, kwargs))
 
 # initial scheduling
 scheduler.enter(2, 1, schedule_sunset)
