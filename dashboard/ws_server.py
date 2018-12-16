@@ -14,9 +14,9 @@ def msg_received(q):
         try:
             msg = json.loads(msg)
         except:
-            print("Got invalid json from client (%s)" % msg)
+            print("Got invalid json from client (%s)" % msg, flush=True)
             return
-        print("Got %s from a ws client; putting to queue" % msg)
+        print("Got %s from a ws client; putting to queue" % msg, flush=True)
         q.put(msg)
     return wrap
 
@@ -29,7 +29,7 @@ def serve(mqtt_q, ws_q):
     t.start()
     while True:
         topic, msg = mqtt_q.get()
-        print("< %s, %s" % (topic,msg))
+        print("< %s, %s" % (topic,msg), flush=True)
         state[topic] = msg
         tstamp = datetime.datetime.now().strftime("%H:%M:%S")
         state['timestamp'] = tstamp
