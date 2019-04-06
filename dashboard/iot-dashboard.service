@@ -1,0 +1,12 @@
+[Unit]
+Description=iot web dashboard backend
+After=syslog.target network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/fast_storage/david/git/iot_home/dashboard
+ExecStart=/fast_storage/david/git/iot_home/dashboard/.venv/bin/python /fast_storage/david/git/iot_home/dashboard/server.py
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
