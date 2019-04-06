@@ -3,7 +3,7 @@ import logging
 import json
 import paho.mqtt.client as mqtt
 
-topics = ['NIGHTLAMP/state', 'TEMP/#', 'HUM/#', 'ALL_CURTAINS/#', 'HOME/KODI_STATUS', 'LIGHTS/#', 'RFPOWER/#']
+topics = ['NIGHTLAMP/state', 'TEMP/#', 'HUM/#', 'ALL_CURTAINS/#', 'HOME/KODI_STATUS', 'LIGHTS/#', 'RFPOWER/#', 'phone/#', 'HDMI/state']
 
 def on_msg_wrapper(q):
     def on_message(client, userdata, message):

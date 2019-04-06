@@ -37,6 +37,10 @@ def buien_data():
     # ssinflux = ss.timestamp()*1000000000
     return {'sunset': ss, 'station': station}
 
+def publish_single(*args, **kwargs):
+    print("Publishing single args: %s kwargs: %s", args, kwargs)
+    publish.single(*args, **kwargs)
+
 def every(interval):
     def cdecorator(func):
         def wrapper(*args, **kwargs):
@@ -57,7 +61,8 @@ def schedule_sunset():
 
     args = ('RFPOWER/set/2', '1')
     kwargs = {'hostname': 'iot', 'retain': True}
-    scheduler.enterabs(sunset_ts, 1, publish.single, argument=args, kwargs=kwargs)
+    #scheduler.enterabs(sunset_ts, 1, publish.single, argument=args, kwargs=kwargs)
+    scheduler.enterabs(sunset_ts, 1, publish_single, argument=args, kwargs=kwargs)
     target_ts = datetime.datetime.fromtimestamp(sunset_ts).strftime('%Y%m%d-%H%M%S')
     print("Scheduling %s at %s with args: %s and kwargs %s" % (publish.single.__name__, target_ts, args, kwargs))
 
