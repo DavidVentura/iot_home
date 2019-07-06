@@ -92,9 +92,11 @@ def OTA_wrapper(callback):
 
         data = msg.decode('ascii').split("|")
         log(data)
+        log("Target IP: %s, Target Port: %s, Local filename: %s, hash: %s" % tuple(data))
         success = receive_ota(data[0], int(data[1]), data[3])
         # ip, port, hash
         if not success:
+            log("File transfer failed. Not overwriting local file.")
             return
 
         import machine
@@ -127,7 +129,8 @@ def receive_ota(host, port, remote_hash):
     f.close()
     local_hash = ubinascii.hexlify(_hash.digest()).decode('ascii')
     if local_hash != remote_hash:
-        log(local_hash)
+        log("Got a bad file transfer? Hash mismatch")
+        log("Local hash: %s, Remote hash: %s" % (local_hash, remote_hash))
         return False
 
     return True
