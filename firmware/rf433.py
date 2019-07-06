@@ -6,11 +6,10 @@ from rfsocket import RFSocket
 
 CLIENT_ID = 'RFPOWER'
 HDMI_SUBTOPIC = b"HDMI/set/#"
-HDMI_PUBTOPIC = b"HDMI/state"
 
 LAMP_SUBTOPIC = b"%s/set/#" % CLIENT_ID
 LAMP_PUBTOPIC = b"%s/state" % CLIENT_ID
-HDMI_PIN = Pin(4, Pin.OUT)
+HDMI_PIN = Pin(5, Pin.OUT)
 
 p = Pin(0, Pin.OUT)
 s = RFSocket(p, remote_id=41203711, chann=RFSocket.NEXA)
@@ -21,11 +20,6 @@ def set_channel_state(channel, state):
     else:
         s.off(channel)
     common.publish(LAMP_PUBTOPIC+b"/%s" % channel, str(state))
-
-def set_pin(pin, state, pubtopic):
-    common.log('Setting pin to %s, publishing to %s' % (state, pubtopic))
-    pin(state)
-    common.publish(pubtopic, str(pin()))
 
 def sub_cb(topic, msg):
     stopic = topic.decode('ascii').split('/')
@@ -39,7 +33,9 @@ def sub_cb(topic, msg):
         if msg in (b'0', b'1'):
             set_channel_state(channel, int(msg))
     if stopic[0] == 'HDMI':
-        set_pin(HDMI_PIN, not HDMI_PIN(), HDMI_PUBTOPIC)
+        HDMI_PIN(1)
+        time.sleep_ms(100)
+        HDMI_PIN(0)
 
 def main():
     #led(1) # Turn off LED, it is inverted
