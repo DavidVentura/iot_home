@@ -1,4 +1,5 @@
 import common
+import time
 from machine import Pin
 from rfsocket import RFSocket
 
@@ -35,7 +36,6 @@ def move_curtains(direction, _time):
         common.log("Got topic as %s" % str(topic))
         return
 
-    import time
     common.log("Moving curtains %s for %d sec" % (topic, _time))
 
     set_pin(relay, False)

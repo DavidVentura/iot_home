@@ -34,7 +34,7 @@ def debounce(interval):
 
 def connect_wifi(STA):
     while not STA.isconnected():
-        print("LOCAL-Connecting to Wi-Fi...")
+        print("LOCAL-Connecting to Wi-Fi... %s" % WIFI_SSID)
         wifi_reconnect_time = time.time() + WIFI_CONNECTION_TIMEOUT
         STA.connect(WIFI_SSID, WIFI_PASSWORD)
 
@@ -45,7 +45,7 @@ def connect_wifi(STA):
 
         if not STA.isconnected():
             print("LOCAL-Connection FAILED!")
-    log("Connected!")
+    log("Connected to %s!" % WIFI_SSID)
 
 def setup_wifi():
     STA = WLAN(STA_IF)
@@ -72,8 +72,10 @@ def mqtt_client(MQTT_HOST, callback=None, subtopic=None):
     if subtopic is not None:
         if type(subtopic) is list:
             for topic in subtopic:
+                log('Subscribing to %s' % topic)
                 mqtt.subscribe(topic)
         else:
+            log('Subscribing to %s' % subtopic)
             mqtt.subscribe(subtopic)
     return mqtt
 

@@ -15,10 +15,13 @@ relay = Pin(12, Pin.OUT)
 dht = dht.DHT22(Pin(14))
 
 def set_pin(pin, state):
+    common.log('Setting pin to %s' % state)
     pin(state)
     common.mqtt.publish(PUBTOPIC, str(pin()))
 
 def sub_cb(topic, msg):
+    common.log(topic)
+    common.log(msg)
     if msg == b'1':
         set_pin(relay, True)
     elif msg == b'0':
@@ -38,6 +41,7 @@ def read_dht():
 
 @common.debounce(250)
 def handle_button(pin):
+    common.log('Button was pressed')
     set_pin(relay, not relay())
 
 def setup():

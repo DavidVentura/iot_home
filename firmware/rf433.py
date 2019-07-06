@@ -21,18 +21,15 @@ def set_channel_state(channel, state):
     common.mqtt.publish(PUBTOPIC+b"/%s" % channel, str(state))
 
 def sub_cb(topic, msg):
-    print(topic)
-    print(msg)
     stopic = topic.decode('ascii').split('/')
+    common.log(topic.decode('ascii'))
     if len(stopic) != 3:
         common.log(topic)
         return
     channel = int(stopic[2])
-    print(stopic[2], channel)
+    common.log(msg.decode('ascii'))
     if msg in (b'0', b'1'):
         set_channel_state(channel, int(msg))
-    else:
-        common.log(msg.decode('ascii'))
 
 def main():
     #led(1) # Turn off LED, it is inverted
