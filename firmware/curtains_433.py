@@ -18,14 +18,13 @@ def set_channel_state(channel, state):
         s.on(channel)
     else:
         s.off(channel)
-    common.mqtt.publish(PUBTOPIC+b"/%s" % channel, str(state))
+    common.publish(PUBTOPIC+b"/%s" % channel, str(state))
 
 
 def set_pin(pin, state):
     PUBTOPIC = b"%s/state/pin_%s" % (CLIENT_ID, str(pin))
     pin(state)
-    if common.mqtt is not None:
-        common.mqtt.publish(PUBTOPIC, str(pin()))
+    common.publish(PUBTOPIC, str(pin()))
 
 def move_curtains(direction, _time):
     if direction == 'up':

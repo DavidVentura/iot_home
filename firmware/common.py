@@ -142,6 +142,13 @@ def log(msg):
     except Exception as e:
         print(e)
 
+def publish(topic, msg, retain=True, qos=0):
+    if mqtt is not None:
+        log.info('Publish %s to %s' % (message, topic))
+        mqtt.publish(topic, msg, retain, qos)
+    else:
+        log('Tried to publish but mqtt is not yet setup')
+
 def loop(_id, setup_fn, loop_fn, callback, subtopic):
     global mqtt
     global OTA_TOPIC

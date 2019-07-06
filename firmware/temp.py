@@ -12,8 +12,8 @@ dht = dht.DHT22(Pin(14))
 @common.debounce(60000)
 def read_dht():
     dht.measure()
-    common.mqtt.publish(TEMPTOPIC, "%.2f" % dht.temperature())
-    common.mqtt.publish(HUMTOPIC, "%.2f" % dht.humidity())
+    common.publish(TEMPTOPIC, "%.2f" % dht.temperature())
+    common.publish(HUMTOPIC, "%.2f" % dht.humidity())
 
 def setup():
     led(1) # Turn off LED, it is inverted

@@ -19,9 +19,8 @@ light_on = True
 
 def set_light(on, value):
     light_pwm.duty(on * value)
-    if common.mqtt:
-        common.mqtt.publish(PUBTOPIC_ON, str(on))
-        common.mqtt.publish(PUBTOPIC_VALUE, str(value))
+    common.publish(PUBTOPIC_ON, str(on))
+    common.publish(PUBTOPIC_VALUE, str(value))
 
 def update_light():
     value =  light_intensity * int(1024/MAX_STEPS_ENCODER)

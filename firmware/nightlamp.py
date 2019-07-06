@@ -17,7 +17,7 @@ dht = dht.DHT22(Pin(14))
 def set_pin(pin, state):
     common.log('Setting pin to %s' % state)
     pin(state)
-    common.mqtt.publish(PUBTOPIC, str(pin()))
+    common.publish(PUBTOPIC, str(pin()))
 
 def sub_cb(topic, msg):
     common.log(topic)
@@ -36,8 +36,8 @@ def read_dht():
     except Exception as e:
         common.log('Failed to get DHT measurements: %s' % e)
         return
-    common.mqtt.publish(TEMPTOPIC, "%.2f" % dht.temperature())
-    common.mqtt.publish(HUMTOPIC, "%.2f" % dht.humidity())
+    common.publish(TEMPTOPIC, "%.2f" % dht.temperature())
+    common.publish(HUMTOPIC, "%.2f" % dht.humidity())
 
 @common.debounce(250)
 def handle_button(pin):
