@@ -144,7 +144,7 @@ def log(msg):
 
 def publish(topic, msg, retain=True, qos=0):
     if mqtt is not None:
-        log('Publish %s to %s' % (message, topic))
+        log('Publish %s to %s' % (msg, topic))
         mqtt.publish(topic, msg, retain, qos)
     else:
         log('Tried to publish but mqtt is not yet setup')
