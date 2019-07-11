@@ -4,7 +4,7 @@ import dht
 from machine import Pin
 from rfsocket import RFSocket
 
-CLIENT_ID = 'RFPOWER'
+CLIENT_ID = common.get_client_id()
 HDMI_SUBTOPIC = b"HDMI/set/#"
 
 LAMP_SUBTOPIC = b"%s/set/#" % CLIENT_ID
