@@ -51,12 +51,13 @@ def connect_wifi(STA):
 
     log("Connected to %s!" % WIFI_SSID)
 
-def setup_wifi():
+def setup_wifi(CLIENT_ID):
     AP = WLAN(AP_IF)
     AP.active(False)
 
     STA = WLAN(STA_IF)
     STA.active(True)
+    STA.config(dhcp_hostname=CLIENT_ID)
     connect_wifi(STA)
     return STA
 
@@ -172,7 +173,7 @@ def loop(_id=None, setup_fn=None, loop_fn=[], callback=None, subtopic=[]):
     global CLIENT_ID
     CLIENT_ID = get_client_id()
     try:
-        STA = setup_wifi()
+        STA = setup_wifi(CLIENT_ID)
         OTA_TOPIC = ("%s/OTA" % CLIENT_ID).encode('ascii')
         mqtt = mqtt_client(MQTT_HOST, callback=OTA_wrapper(callback), subtopic=subtopic+[OTA_TOPIC])
         if setup_fn is not None:
