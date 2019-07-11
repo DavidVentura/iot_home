@@ -1,8 +1,9 @@
+import time
+import usocket
+import uos
 from machine import Pin, reset
 from network import WLAN, STA_IF, AP_IF
 from mqtt import MQTTClient
-import time
-import usocket
 from ubinascii import hexlify
 
 MQTT_HOST = 'iot'
@@ -37,6 +38,7 @@ def connect_wifi(STA):
         print("LOCAL-Connecting to Wi-Fi... %s" % WIFI_SSID)
         wifi_reconnect_time = time.time() + WIFI_CONNECTION_TIMEOUT
         STA.connect(WIFI_SSID, WIFI_PASSWORD)
+        time.sleep_ms(10)
 
         while not STA.isconnected() and time.time() < wifi_reconnect_time:
             led.value(not led())
@@ -44,7 +46,9 @@ def connect_wifi(STA):
             time.sleep_ms(1000)
 
         if not STA.isconnected():
+            # reset device?
             print("LOCAL-Connection FAILED!")
+
     log("Connected to %s!" % WIFI_SSID)
 
 def setup_wifi():
@@ -66,7 +70,7 @@ def connect_mqtt(m):
             log(e)
             time.sleep_ms(200)
 
-def mqtt_client(MQTT_HOST, callback=None, subtopic):
+def mqtt_client(MQTT_HOST, callback, subtopic):
     assert type(subtopic) is list
     mqtt = MQTTClient(CLIENT_ID, MQTT_HOST)
     if callback:
@@ -98,12 +102,18 @@ def OTA_wrapper(callback):
             log("File transfer failed. Not overwriting local file.")
             return
 
-        import machine
-        import uos
         log("renaming tmp to %s" % data[2])
         uos.rename('tmp', data[2])
-        log('restarting')
-        machine.reset()
+
+        reboot = True
+        if len(data) == 5:
+            reboot = bool(data[4])
+
+        if reboot:
+            log('Restarting, as requested by OTA (or default)')
+            reset()
+        else:
+            log('Not restarting, as requested by OTA')
     return OTA
 
 def receive_ota(host, port, remote_hash):
@@ -151,7 +161,7 @@ def publish(topic, msg, retain=True, qos=0):
         log('Tried to publish but mqtt is not yet setup')
 
 def get_client_id():
-    if 'HOSTNAME' in os.listdir('/'):
+    if 'HOSTNAME' in uos.listdir('/'):
         return open('HOSTNAME', 'r').read().strip()
     mac = hexlify(WLAN().config('mac'),':').decode()
     return mac
@@ -177,4 +187,5 @@ def loop(_id=None, setup_fn=None, loop_fn=[], callback=None, subtopic=[]):
         mqtt.disconnect()
     except Exception as e:
         log(e)
+        log('Resetting')
         reset()
