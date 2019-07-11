@@ -6,7 +6,7 @@ import socket
 import sys
 import paho.mqtt.publish as publish
 
-PORT = 1234
+PORT = 1233
 HOSTNAME = socket.gethostname()
 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -16,14 +16,15 @@ s.close()
 
 HOSTNAME = localip # my notebook does not get resolved for some reason
 
-def main(_file, fname, target):
+def main(_file, fname, target, reboot=False):
     content = open(_file, 'r', encoding='ascii').read()
     sha1 = hashlib.sha1(content.encode('ascii')).hexdigest()
 
     if fname is None:
         fname = os.path.basename(_file)
 
-    payload = "{hostname}|{port}|{filename}|{hash}".format(hash=sha1, filename=fname, hostname=HOSTNAME, port=PORT)
+    payload = "{hostname}|{port}|{filename}|{hash}".format(hash=sha1, filename=fname, hostname=HOSTNAME, port=PORT, reboot=int(reboot))
+    payload = "{hostname}|{port}|{filename}|{hash}|{reboot}".format(hash=sha1, filename=fname, hostname=HOSTNAME, port=PORT, reboot=int(reboot))
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -50,9 +51,12 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("file")
     parser.add_argument("--as-file", required=False)
-    parser.add_argument("--target", required=True, help="Target CLIENT_ID, case sensitive")
+    parser.add_argument("--reboot", action='store_true')
+    parser.add_argument("--target", required=True, help="Target hostname, case sensitive")
     args = parser.parse_args()
     if not os.path.isfile(args.file):
-        print("%s doesnt exist / is not afile" % fname)
+        print("%s does not exist / is not a file" % fname)
         sys.exit(1)
-    main(args.file, args.as_file, args.target)
+
+    print(args.reboot)
+    main(args.file, args.as_file, args.target, args.reboot)
