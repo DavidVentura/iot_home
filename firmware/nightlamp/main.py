@@ -47,6 +47,7 @@ def handle_button(pin):
 def setup():
     button.irq(handler=handle_button, trigger=Pin.IRQ_RISING),
     led(1) # Turn off LED, it is inverted
+
 def main():
     common.loop(setup_fn=setup, loop_fn=[read_dht], callback=sub_cb, subtopic=[SUBTOPIC])
 

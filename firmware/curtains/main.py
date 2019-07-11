@@ -1,25 +1,14 @@
 import common
 import time
 from machine import Pin
-from rfsocket import RFSocket
 
-CLIENT_ID = 'ALL_CURTAINS'
-TOPIC_PREFIX = "%s/set" % CLIENT_ID
-SUBTOPICS = [b"ALL_CURTAINS/set/#" % TOPIC_PREFIX, b"RFPOWER/set/#"]
+CLIENT_ID = common.get_client_id()
+SUBTOPIC = b"%s/set/#" % CLIENT_ID
 
 relay_up = Pin(16, Pin.OUT)  # D0
 relay_down = Pin(4, Pin.OUT) # D2
 
 p = Pin(0, Pin.OUT)
-s = RFSocket(p, remote_id=41203711, chann=RFSocket.NEXA)
-
-def set_channel_state(channel, state):
-    if state:
-        s.on(channel)
-    else:
-        s.off(channel)
-    common.publish(PUBTOPIC+b"/%s" % channel, str(state))
-
 
 def set_pin(pin, state):
     PUBTOPIC = b"%s/state/pin_%s" % (CLIENT_ID, str(pin))
@@ -49,21 +38,13 @@ def sub_cb(topic, msg):
         common.log(topic)
         return
 
-    if stopic[0] == 'ALL_CURTAINS':
-        try:
-            _time = int(msg.decode())
-            _time = min(_time, 20)
-        except Exception as e:
-            common.log(e)
-            return
-        move_curtains(stopic[2], _time)
-    elif stopic[0] == 'RFPOWER':
-        channel = int(stopic[2])
-        print(stopic[2], channel)
-        if msg in (b'0', b'1'):
-            set_channel_state(channel, int(msg))
-        else:
-            common.log(msg.decode('ascii'))
+    try:
+        _time = int(msg.decode())
+        _time = min(_time, 20)
+    except Exception as e:
+        common.log(e)
+        return
+    move_curtains(stopic[2], _time)
 
 def setup():
     set_pin(relay_down, True)
@@ -71,6 +52,6 @@ def setup():
 
 def main():
     setup()
-    common.loop(setup_fn=None, loop_fn=[], callback=sub_cb, subtopic=SUBTOPICS)
+    common.loop(setup_fn=None, loop_fn=[], callback=sub_cb, subtopic=[SUBTOPIC])
 
 main()
