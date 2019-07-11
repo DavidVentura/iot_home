@@ -11,6 +11,7 @@ You can see more info [here](https://blog.davidventura.com.ar/iot-house-with-son
 * Remote logging (simple messages sent via UDP)
 * The program flow is an event loop; setup followed by loop()
     * You have to set up your IRQ handlers during setup
+* By providing a `HOSTNAME` file you can set your device's name. It will be used for DHCP and MQTT topics.
 
 
 # Pushing an OTA update
