@@ -1,5 +1,4 @@
 import common
-import time
 from machine import Pin
 
 CLIENT_ID = common.get_client_id()
