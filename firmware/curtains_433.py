@@ -71,6 +71,6 @@ def setup():
 
 def main():
     setup()
-    common.loop(CLIENT_ID, setup_fn=None, loop_fn=[], callback=sub_cb, subtopic=SUBTOPICS)
+    common.loop(setup_fn=None, loop_fn=[], callback=sub_cb, subtopic=SUBTOPICS)
 
 main()

@@ -39,6 +39,6 @@ def sub_cb(topic, msg):
 
 def main():
     #led(1) # Turn off LED, it is inverted
-    common.loop(CLIENT_ID, setup_fn=None, loop_fn=[], callback=sub_cb, subtopic=[LAMP_SUBTOPIC, HDMI_SUBTOPIC])
+    common.loop(setup_fn=None, loop_fn=[], callback=sub_cb, subtopic=[LAMP_SUBTOPIC, HDMI_SUBTOPIC])
 
 main()
