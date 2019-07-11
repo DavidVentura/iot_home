@@ -1,8 +1,9 @@
 from machine import Pin, reset
-from network import WLAN, STA_IF
+from network import WLAN, STA_IF, AP_IF
 from mqtt import MQTTClient
 import time
 import usocket
+from ubinascii import hexlify
 
 MQTT_HOST = 'iot'
 WIFI_CONNECTION_TIMEOUT = 10  # seconds
@@ -47,6 +48,9 @@ def connect_wifi(STA):
     log("Connected to %s!" % WIFI_SSID)
 
 def setup_wifi():
+    AP = WLAN(AP_IF)
+    AP.active(False)
+
     STA = WLAN(STA_IF)
     STA.active(True)
     connect_wifi(STA)
@@ -104,7 +108,6 @@ def OTA_wrapper(callback):
 
 def receive_ota(host, port, remote_hash):
     import uhashlib
-    import ubinascii
     sockaddr = usocket.getaddrinfo(host, port)[0][-1]
     # You need this object even for numeric addresses
 
@@ -122,7 +125,7 @@ def receive_ota(host, port, remote_hash):
         f.write(d)
     sock.close()
     f.close()
-    local_hash = ubinascii.hexlify(_hash.digest()).decode('ascii')
+    local_hash = hexlify(_hash.digest()).decode('ascii')
     if local_hash != remote_hash:
         log("Got a bad file transfer? Hash mismatch")
         log("Local hash: %s, Remote hash: %s" % (local_hash, remote_hash))
@@ -147,11 +150,17 @@ def publish(topic, msg, retain=True, qos=0):
     else:
         log('Tried to publish but mqtt is not yet setup')
 
+def get_client_id():
+    if 'HOSTNAME' in os.listdir('/'):
+        return open('HOSTNAME', 'r').read().strip()
+    mac = hexlify(WLAN().config('mac'),':').decode()
+    return mac
+
 def loop(_id, setup_fn, loop_fn, callback, subtopic):
     global mqtt
     global OTA_TOPIC
     global CLIENT_ID
-    CLIENT_ID = _id
+    CLIENT_ID = get_client_id()
     try:
         STA = setup_wifi()
         OTA_TOPIC = ("%s/OTA" % CLIENT_ID).encode('ascii')
