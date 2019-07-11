@@ -164,7 +164,7 @@ def publish(topic, msg, retain=True, qos=0):
 def get_client_id():
     if 'HOSTNAME' in uos.listdir('/'):
         return open('HOSTNAME', 'r').read().strip()
-    mac = hexlify(WLAN().config('mac'),':').decode()
+    mac = hexlify(WLAN().config('mac'),'_').decode()
     return mac
 
 def loop(_id=None, setup_fn=None, loop_fn=[], callback=None, subtopic=[]):
