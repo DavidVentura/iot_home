@@ -45,7 +45,7 @@ def handle_button(pin):
     set_pin(relay, not relay())
 
 def setup():
-    button.irq(handler=handle_button, trigger=Pin.IRQ_RISING),
+    button.irq(handler=handle_button, trigger=Pin.IRQ_RISING)
     led(1) # Turn off LED, it is inverted
 
 def main():
