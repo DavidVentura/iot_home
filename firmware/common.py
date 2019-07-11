@@ -96,7 +96,7 @@ def OTA_wrapper(callback):
 
         data = msg.decode('ascii').split("|")
         log(data)
-        log("Target IP: %s, Target Port: %s, Local filename: %s, hash: %s" % tuple(data))
+        log("Target IP: %s, Target Port: %s, Local filename: %s, hash: %s" % (data[0], data[1], data[2], data[3]))
         success = receive_ota(data[0], int(data[1]), data[3])
         # ip, port, hash
         if not success:
