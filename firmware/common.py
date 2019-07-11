@@ -156,7 +156,7 @@ def get_client_id():
     mac = hexlify(WLAN().config('mac'),':').decode()
     return mac
 
-def loop(setup_fn, loop_fn, callback, subtopic):
+def loop(_id=None, setup_fn=None, loop_fn=[], callback=None, subtopic=[]):
     global mqtt
     global OTA_TOPIC
     global CLIENT_ID
