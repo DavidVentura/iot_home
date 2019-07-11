@@ -8,7 +8,6 @@ MQTT_HOST = 'iot'
 WIFI_CONNECTION_TIMEOUT = 10  # seconds
 WIFI_SSID = 'cuevita'
 WIFI_PASSWORD = 'salander'
-PUBLISH_INTERVAL = 60 # seconds
 OTA_TOPIC = None
 CLIENT_ID = "ID_NOT_SET"
 LOGSERVER = '192.168.2.189'
@@ -63,20 +62,15 @@ def connect_mqtt(m):
             log(e)
             time.sleep_ms(200)
 
-def mqtt_client(MQTT_HOST, callback=None, subtopic=None):
+def mqtt_client(MQTT_HOST, callback=None, subtopic):
+    assert type(subtopic) is list
     mqtt = MQTTClient(CLIENT_ID, MQTT_HOST)
     if callback:
         mqtt.set_callback(callback)
     connect_mqtt(mqtt)
-    mqtt.subscribe(OTA_TOPIC)
-    if subtopic is not None:
-        if type(subtopic) is list:
-            for topic in subtopic:
-                log('Subscribing to %s' % topic)
-                mqtt.subscribe(topic)
-        else:
-            log('Subscribing to %s' % subtopic)
-            mqtt.subscribe(subtopic)
+    for topic in subtopic:
+        log('Subscribing to %s' % topic)
+        mqtt.subscribe(topic)
     return mqtt
 
 def OTA_wrapper(callback):
@@ -85,6 +79,7 @@ def OTA_wrapper(callback):
             callback(topic, msg)
             return
 
+        log("Receiving OTA update..")
         if len(msg) < 45: # 40 is the length of the sha1
             log("Something wrong with the message")
             log(msg)
@@ -158,9 +153,9 @@ def loop(_id, setup_fn, loop_fn, callback, subtopic):
     global CLIENT_ID
     CLIENT_ID = _id
     try:
-        OTA_TOPIC = ("%s/OTA" % CLIENT_ID).encode('ascii')
         STA = setup_wifi()
-        mqtt = mqtt_client(MQTT_HOST, callback=OTA_wrapper(callback), subtopic=subtopic)
+        OTA_TOPIC = ("%s/OTA" % CLIENT_ID).encode('ascii')
+        mqtt = mqtt_client(MQTT_HOST, callback=OTA_wrapper(callback), subtopic=subtopic+[OTA_TOPIC])
         if setup_fn is not None:
             setup_fn()
         while True:

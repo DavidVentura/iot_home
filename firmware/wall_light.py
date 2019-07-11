@@ -64,7 +64,7 @@ def setup():
     sw.irq(trigger=Pin.IRQ_FALLING, handler=btn_callback)
 
 def main():
-    common.loop(CLIENT_ID, setup_fn=setup, loop_fn=[], callback=sub_cb, subtopic=SUBTOPIC)
+    common.loop(CLIENT_ID, setup_fn=setup, loop_fn=[], callback=sub_cb, subtopic=[SUBTOPIC])
 
 e = Encoder(4, 0, min_val=1, max_val=MAX_STEPS_ENCODER, callback=rotary_cb) # d2, d3 => order matters for rotation direction
 main()

@@ -5,7 +5,7 @@ from rfsocket import RFSocket
 
 CLIENT_ID = 'ALL_CURTAINS'
 TOPIC_PREFIX = "%s/set" % CLIENT_ID
-SUBTOPIC = [b"ALL_CURTAINS/set/#" % TOPIC_PREFIX, b"RFPOWER/set/#"]
+SUBTOPICS = [b"ALL_CURTAINS/set/#" % TOPIC_PREFIX, b"RFPOWER/set/#"]
 
 relay_up = Pin(16, Pin.OUT)  # D0
 relay_down = Pin(4, Pin.OUT) # D2
@@ -71,6 +71,6 @@ def setup():
 
 def main():
     setup()
-    common.loop(CLIENT_ID, setup_fn=None, loop_fn=[], callback=sub_cb, subtopic=SUBTOPIC)
+    common.loop(CLIENT_ID, setup_fn=None, loop_fn=[], callback=sub_cb, subtopic=SUBTOPICS)
 
 main()
