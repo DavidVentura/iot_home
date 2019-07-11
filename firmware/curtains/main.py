@@ -8,12 +8,10 @@ SUBTOPIC = b"%s/set/#" % CLIENT_ID
 relay_up = Pin(16, Pin.OUT)  # D0
 relay_down = Pin(4, Pin.OUT) # D2
 
-p = Pin(0, Pin.OUT)
-
 def set_pin(pin, state):
-    PUBTOPIC = b"%s/state/pin_%s" % (CLIENT_ID, str(pin))
+    #PUBTOPIC = b"%s/state/pin_%s" % (CLIENT_ID, str(pin))
     pin(state)
-    common.publish(PUBTOPIC, str(pin()))
+    #common.publish(PUBTOPIC, str(pin()))
 
 def move_curtains(direction, _time):
     if direction == 'up':
@@ -21,15 +19,16 @@ def move_curtains(direction, _time):
     elif direction == 'down':
         relay = relay_down
     else:
-        common.log("Got topic as %s" % str(topic))
+        common.log("Got invalid direction: %s" % str(direction))
         return
 
-    common.log("Moving curtains %s for %d sec" % (topic, _time))
+    common.log("Moving curtains %s for %d sec" % (direction, _time))
 
     set_pin(relay, False)
     for i in range(0, 10):
         time.sleep_ms(_time*100)
     set_pin(relay, True)
+    common.log("Done")
 
 def sub_cb(topic, msg):
     stopic = topic.decode('ascii').split('/')
