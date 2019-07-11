@@ -108,7 +108,7 @@ def OTA_wrapper(callback):
 
         reboot = True
         if len(data) == 5:
-            reboot = bool(data[4])
+            reboot = int(data[4])
 
         if reboot:
             log('Restarting, as requested by OTA (or default)')
