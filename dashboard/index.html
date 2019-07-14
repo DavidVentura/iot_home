@@ -156,5 +156,13 @@
             last update
             <span statuskey='timestamp'>{CUR}</span>
         </div>
+
+        <div class=row>
+            Printer power <span statuskey='PRINTER_POWER/state'>{STATUS}</span>
+            <div>
+            <button onclick='send_msg("PRINTER_POWER/set", 1)'>ON</button>
+            <button onclick='send_msg("PRINTER_POWER/set", 0)'>OFF</button>
+            </div>
+        </div>
     </body>
 </html>
