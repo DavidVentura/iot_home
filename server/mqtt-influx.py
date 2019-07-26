@@ -6,7 +6,7 @@ import datetime
 
 from mqtt import Mqtt
 
-GRAFANA_URL = "http://grafana.labs:8086/write?db=sensordata"
+GRAFANA_URL = "http://db.labs:8086/write?db=sensordata"
 
 
 def setup():
