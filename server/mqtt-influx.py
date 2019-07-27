@@ -14,7 +14,7 @@ def setup():
     port = 1883
     topics = ["TEMP/TEMPSENSOR", "HUM/TEMPSENSOR", "HUM/#", "TEMP/#", "NIGHTLAMP2/state", "KINDLE/battery/state", "KINDLE/percentage/state", "phone/#"]
     # CONFIG
-    return Mqtt(host, port, topics, [to_influx])
+    return Mqtt(host, port, topics, [to_influx], _json=False)
 
 def main():
     mqttc = setup()
