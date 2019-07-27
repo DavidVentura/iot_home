@@ -60,6 +60,7 @@ while 1:
             if mac in mac_mapping:
                 who = mac_mapping[mac]
                 state = 'PRESENT' if state == 'AP-STA-CONNECTED' else 'AWAY'
+                state = '1' if state == 'AP-STA-CONNECTED' else '0'
                 print(who, state)
                 publish.single('%s/state' % who, state, hostname=iot_host, retain=True)
             else:
