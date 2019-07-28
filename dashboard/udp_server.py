@@ -63,7 +63,7 @@ while 1:
                 print(who, state)
                 publish.single('%s/state' % who, state, hostname=iot_host, retain=True)
             else:
-                print(mac, state)
+                print('Unknown mac addr', mac, state)
         elif key == 'hdmi':
             value = split[1]
             print(value)
