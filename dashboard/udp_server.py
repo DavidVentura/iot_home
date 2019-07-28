@@ -56,7 +56,7 @@ while 1:
             publish.single(kindle_bat_topic, str(value), hostname=iot_host)
         elif key == 'wlan0':
             state = split[1]
-            mac = split[2]
+            mac = split[2].lower()
             if mac in mac_mapping:
                 who = mac_mapping[mac]
                 state = '1' if state == 'AP-STA-CONNECTED' else '0'
