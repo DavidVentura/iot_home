@@ -23,7 +23,8 @@ except socket.error as msg:
     exit(1)
 
 mac_mapping = {'f4:60:e2:b4:68:c4': "phones/david", 
-               'bc:f5:ac:fd:3a:52': "phones/tati",
+               'a4:50:46:5b:fd:e1': "phones/tati",
+               'bc:f5:ac:fd:3a:52': "phones/old-tati",
                '18:21:95:82:c0:a1': "phones/old-david",
               }
 # TODO add logserver
