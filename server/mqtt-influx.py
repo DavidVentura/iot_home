@@ -52,14 +52,14 @@ def printer_parsing(topic, value):
     elif topic == "printer/TEMP":
         nozzle, bed = value.split(',')
         for sensor, current, target in [['nozzle']+nozzle.split('/'), ['bed']+bed.split('/')]
-            _data = 'printer_temp,sensor="%s" current=%f,target=%f' % (sensor, float(current), float(target))
+            _data = 'printer_temp,sensor=%s current=%f,target=%f' % (sensor, float(current), float(target))
             post_to_grafana(_data)
 
 
 def default_parsing(topic, value):
     _type = topic.split('/')[0]
     sensor = topic.split('/')[1]
-    _data = '%s,sensor="%s" value=%f' % (_type, sensor, float(value))
+    _data = '%s,sensor=%s value=%f' % (_type, sensor, float(value))
     post_to_grafana(_data)
     
 if __name__ == '__main__':
