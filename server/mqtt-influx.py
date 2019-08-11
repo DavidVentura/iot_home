@@ -35,7 +35,7 @@ def to_influx(topic, value):
 
 def post_to_grafana(data):
         try:
-            response = requests.post(GRAFANA_URL, data=_data, timeout=2)
+            response = requests.post(GRAFANA_URL, data=data, timeout=2)
             if not response.ok:
                 print(_data)
                 print(response)
