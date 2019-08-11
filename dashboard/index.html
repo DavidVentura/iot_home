@@ -158,6 +158,15 @@
         </div>
 
         <div class=row>
+            printer temp
+            <span statuskey='printer/TEMP'>{CUR}</span>
+        </div>
+        <div class=row>
+            printer job status
+            <span statuskey='printer/JOB_STATUS'>{CUR}</span>
+        </div>
+
+        <div class=row>
             Printer power <span statuskey='PRINTER_POWER/state'>{STATUS}</span>
             <div>
             <button onclick='send_msg("PRINTER_POWER/set", 1)'>ON</button>
