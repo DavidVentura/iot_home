@@ -51,7 +51,7 @@ def printer_parsing(topic, value):
         post_to_grafana(_data)
     elif topic == "printer/TEMP":
         nozzle, bed = value.split(',')
-        for sensor, current, target in [['nozzle']+nozzle.split('/'), ['bed']+bed.split('/')]
+        for sensor, current, target in [['nozzle']+nozzle.split('/'), ['bed']+bed.split('/')]:
             _data = 'printer_temp,sensor=%s current=%f,target=%f' % (sensor, float(current), float(target))
             post_to_grafana(_data)
 
