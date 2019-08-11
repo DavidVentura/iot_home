@@ -7,7 +7,6 @@ import datetime
 from mqtt import Mqtt
 
 GRAFANA_URL = "http://db.labs:8086/write?db=sensordata"
-custom_parsing = { 'printer': printer_parsing }
 
 def setup():
     host = 'iot'
@@ -26,6 +25,7 @@ def main():
         pass
 
 def to_influx(topic, value):
+    custom_parsing = { 'printer': printer_parsing }
     print(datetime.datetime.now(), topic, value)
     _type = topic.split('/')[0]
     if _type in custom_parsing:
