@@ -44,6 +44,9 @@
                         case 'LIGHTS/state/intensity':
                             labels[key] = parseInt(parseInt(state[key])/1024*100) + "%";
                             break
+                        case 'zigbee2mqtt/PlantSwitch':
+                            labels[key] = state['state'];
+                            break
                         default:
                             labels[key] = state[key];
                     }
@@ -58,6 +61,10 @@
                             label.innerText = labels[key];
                     }
                 }
+            }
+            function send_msg_zigbee(topic, value) {
+		var obj = {topic: {"state": value}};
+                ws.send(JSON.stringify(obj));
             }
             function send_msg(topic, value) {
                 var obj = {};
@@ -96,10 +103,10 @@
             </div>
         </div>
         <div class=row>
-            Night lamp <span statuskey='NIGHTLAMP/state'>{STATUS}</span>
+            Plant lamp <span statuskey='zigbee2mqtt/PlantSwitch'>{STATUS}</span>
             <div>
-            <button onclick='send_msg("NIGHTLAMP/set", 1)'>ON</button>
-            <button onclick='send_msg("NIGHTLAMP/set", 0)'>OFF</button>
+            <button onclick='send_msg_zigbee("zigbee2mqtt/PlantSwitch/set", "ON")'>ON</button>
+            <button onclick='send_msg_zigbee("zigbee2mqtt/PlantSwitch/set", "OFF")'>OFF</button>
             </div>
         </div>
         <div class=row>
