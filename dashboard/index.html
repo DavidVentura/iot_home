@@ -45,7 +45,7 @@
                             labels[key] = parseInt(parseInt(state[key])/1024*100) + "%";
                             break
                         case 'zigbee2mqtt/PlantSwitch':
-                            labels[key] = state['state'];
+                            labels[key] = JSON.parse(state[key])['state'];
                             break
                         default:
                             labels[key] = state[key];
@@ -64,7 +64,7 @@
             }
             function send_msg_zigbee(topic, value) {
 		var obj = {};
-		obj[topic] = {"state": value};
+		obj[topic] = JSON.stringify({"state": value});
                 ws.send(JSON.stringify(obj));
             }
             function send_msg(topic, value) {
