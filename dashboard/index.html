@@ -63,7 +63,8 @@
                 }
             }
             function send_msg_zigbee(topic, value) {
-		var obj = {topic: {"state": value}};
+		var obj = {};
+		obj[topic] = {"state": value};
                 ws.send(JSON.stringify(obj));
             }
             function send_msg(topic, value) {
