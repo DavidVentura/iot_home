@@ -11,7 +11,7 @@ GRAFANA_URL = "http://db.labs:8086/write?db=sensordata"
 def setup():
     host = 'iot'
     port = 1883
-    topics = ["TEMP/TEMPSENSOR", "HUM/TEMPSENSOR", "HUM/#", "TEMP/#", "NIGHTLAMP2/state", "KINDLE/battery/state", "KINDLE/percentage/state", "phones/#", "printer/#"]
+    topics = ["TEMP/TEMPSENSOR", "HUM/TEMPSENSOR", "HUM/#", "TEMP/#", "NIGHTLAMP2/state", "KINDLE/battery/state", "KINDLE/percentage/state", "phones/#", "printer/#", "LUX/state"]
     # CONFIG
     return Mqtt(host, port, topics, [to_influx], _json=False)
 
@@ -35,7 +35,7 @@ def to_influx(topic, value):
 
 def post_to_grafana(data):
         try:
-            response = requests.post(GRAFANA_URL, data=data, timeout=2)
+            response = requests.post(GRAFANA_URL, data=data, timeout=3)
             if not response.ok:
                 print(_data)
                 print(response)
