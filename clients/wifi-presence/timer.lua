@@ -13,8 +13,18 @@ client = mqtt.new()
 client.ON_CONNECT = function()
 	local qos = 1
 	local retain = false
+	local found = find_pairs()
 	
-	for idx, mac in pairs(find_pairs()) do
+	state = {}
+	for mac, _ in pairs(known) do
+		state[mac] = 0
+	end
+
+	for idx, mac in pairs(found) do
+		state[mac] = 1
+	end
+
+	for mac, present in pairs(state) do
 		who = known[mac]
 		mid = client:publish("phones/" .. who .. "/state", tonumber(present), qos, retain)
 		pending_mIDs[mid] = 1
