@@ -37,3 +37,8 @@ In /etc/rc.local
 ```
 hostapd_cli -a /root/hook.lua  -i wlan0 -B 
 ```
+
+In /etc/crontabs/root
+```
+*/2 * * * * /usr/bin/lua /root/timer.lua
+```
