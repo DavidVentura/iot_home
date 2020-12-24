@@ -3,8 +3,8 @@
 mqtt = require("mosquitto")
 
 known = {}
-known["F4:60:E2:B4:68:C4"] = "David"
-known["A4:50:46:5B:FD:E1"] = "Tati"
+known["F4:60:E2:B4:68:C4"] = "david"
+known["A4:50:46:5B:FD:E1"] = "tati"
 
 if arg[2] == "AP-STA-CONNECTED" then
 	present = 1
@@ -18,7 +18,7 @@ client.ON_CONNECT = function()
 	local qos = 1
 	local retain = false
 	who = known[mac]
-	client:publish("PRESENCE/" .. who, tonumber(present), qos, retain)
+	client:publish("phones/" .. who .. "/state", tonumber(present), qos, retain)
 	print("Publishing..")
 end
 
