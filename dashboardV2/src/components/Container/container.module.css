@@ -1,0 +1,11 @@
+.main {
+  @apply sm:mx-4;
+}
+
+.roundBorder {
+  @apply rounded-lg overflow-hidden;
+}
+
+.shadow {
+  @apply shadow-lg;
+}

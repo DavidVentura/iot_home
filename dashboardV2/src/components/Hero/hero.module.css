@@ -1,0 +1,3 @@
+.main {
+  @apply bg-moody text-white p-4 bg-gradient-to-t;
+}
