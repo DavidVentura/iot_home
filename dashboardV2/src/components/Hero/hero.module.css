@@ -1,3 +1,7 @@
 .main {
-  @apply bg-moody text-white p-4 bg-gradient-to-t;
+  @apply bg-moody text-white p-4 flex justify-between gap-8 flex-wrap items-center py-6 bg-gradient-to-r from-sail via-moody to-vivid text-xl;
+}
+
+.day h1 {
+  @apply uppercase;
 }

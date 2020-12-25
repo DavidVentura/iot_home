@@ -1,9 +1,9 @@
 .main {
-  @apply sm:mx-4;
+  @apply sm:m-4;
 }
 
 .roundBorder {
-  @apply rounded-lg overflow-hidden;
+  @apply sm:rounded-lg overflow-hidden;
 }
 
 .shadow {

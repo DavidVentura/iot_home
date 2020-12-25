@@ -1,0 +1,31 @@
+.container {
+  @apply relative shadow-top;
+}
+
+.navigation {
+  @apply flex items-center;
+}
+
+.navigationItem {
+  @apply w-1/4;
+}
+
+.navigationLink {
+  @apply text-center text-xs uppercase text-grey-light flex flex-col items-center justify-center py-2 font-medium border-t-4 border-grey-lighter hover:opacity-80 focus:bg-opacity-90;
+}
+
+.navigationLink svg {
+  @apply h-4 sm:h-8 mb-2;
+}
+
+.navigationLinkActive {
+  @apply text-moody border-moody;
+}
+
+.navigationIndicator {
+  @apply h-1 bg-grey-lighter w-full flex;
+}
+
+.navigationIndicatorBar {
+  @apply w-1/4 h-1 bg-moody transition-all translate-x-0;
+}
