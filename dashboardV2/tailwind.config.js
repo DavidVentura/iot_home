@@ -1,15 +1,3 @@
-const fallback = [
-  '-apple-system',
-  'BlinkMacSystemFont',
-  'Segoe UI',
-  'Roboto',
-  'Oxygen-Sans',
-  'Ubuntu',
-  'Cantarell',
-  'Helvetica Neue',
-  'sans-serif',
-];
-
 module.exports = {
   purge: ['./src/**/*.{js,jsx,ts,tsx}', './public/index.html'],
   darkMode: false, // or 'media' or 'class'
@@ -36,7 +24,10 @@ module.exports = {
       },
       moody: {
         DEFAULT: '#827DBE',
-        dark: '#874B96'
+        dark: '#686498'
+      },
+      vivid: {
+        DEFAULT: '#874B96'
       }
     },
     screens: {
@@ -110,6 +101,7 @@ module.exports = {
       '2xl': '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
       inner: 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)',
       none: 'none',
+      top: '0 -10px 6px 0px rgba(0, 0, 0, 0.02)',
     },
     cursor: {
       auto: 'auto',
@@ -138,7 +130,7 @@ module.exports = {
       hero: ['135deg', '#a5d7f5 0%', '#82afdc 20%', '#827dbe 51%', '#874b96 75%', 'rgba(135,30,95,1) 100%']
     },
     fontFamily: {
-      body: ['Quicksand', 'sans-serif', ...fallback]
+      body: ['Quicksand', 'sans-serif']
     },
     fontSize: {
       xs: ['0.75rem', { lineHeight: '1rem' }],

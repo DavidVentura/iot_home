@@ -2,6 +2,36 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'Quicksand';
+  font-weight: 400;
+  src: url('fonts/Quicksand-Regular.ttf') format('truetype')
+}
+
+@font-face {
+  font-family: 'Quicksand';
+  font-weight: 300;
+  src: url('fonts/Quicksand-Light.ttf') format('truetype')
+}
+
+@font-face {
+  font-family: 'Quicksand';
+  font-weight: 500;
+  src: url('fonts/Quicksand-Medium.ttf') format('truetype')
+}
+
+@font-face {
+  font-family: 'Quicksand';
+  font-weight: 600;
+  src: url('fonts/Quicksand-SemiBold.ttf') format('truetype')
+}
+
+@font-face {
+  font-family: 'Quicksand';
+  font-weight: 700;
+  src: url('fonts/Quicksand-Bold.ttf') format('truetype')
+}
+
 body {
   @apply font-body m-0 bg-white-smoke;
   -webkit-font-smoothing: antialiased;
@@ -11,4 +41,8 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+h1 {
+  @apply text-2xl;
 }
