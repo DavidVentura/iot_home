@@ -11,7 +11,7 @@ GRAFANA_URL = "http://db.labs:8086/write?db=sensordata"
 def setup():
     host = 'iot'
     port = 1883
-    topics = ["TEMP/TEMPSENSOR", "HUM/TEMPSENSOR", "HUM/#", "TEMP/#", "NIGHTLAMP2/state", "KINDLE/battery/state", "KINDLE/percentage/state", "phones/#", "printer/#", "LUX/state"]
+    topics = ["TEMP/TEMPSENSOR", "HUM/TEMPSENSOR", "HUM/#", "TEMP/#", "NIGHTLAMP2/state", "KINDLE/battery/state", "KINDLE/percentage/state", "phones/#", "printer/#", "LUX/state", "DESK/state"]
     # CONFIG
     return Mqtt(host, port, topics, [to_influx], _json=False)
 
