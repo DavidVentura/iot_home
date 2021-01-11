@@ -12,7 +12,8 @@ WIFI_SSID = 'cuevita'
 WIFI_PASSWORD = 'salander'
 OTA_TOPIC = None
 CLIENT_ID = "ID_NOT_SET"
-LOGSERVER = '192.168.2.189'
+LOGSERVER = '192.168.2.1'
+LOG_SOCKADDR = usocket.getaddrinfo(LOGSERVER, 3333)[0][-1]
 
 led = Pin(13, Pin.OUT)
 _debounce = {}
@@ -54,10 +55,13 @@ def connect_wifi(STA):
 def setup_wifi(CLIENT_ID):
     AP = WLAN(AP_IF)
     AP.active(False)
+    log("AP Down")
 
     STA = WLAN(STA_IF)
     STA.active(True)
+    log("STA Up")
     STA.config(dhcp_hostname=CLIENT_ID)
+    log("Config UP")
     connect_wifi(STA)
     return STA
 
@@ -142,15 +146,19 @@ def receive_ota(host, port, remote_hash):
         log("Local hash: %s, Remote hash: %s" % (local_hash, remote_hash))
         return False
 
+    log("OTA Received correctly")
     return True
 
 def log(msg):
-    print(msg)
+    print('Local log:', msg)
+    return
+    msg = str(msg)
     try:
         s = usocket.socket(usocket.AF_INET, usocket.SOCK_DGRAM)
-        address = (LOGSERVER, 3333)
-        s.connect(address)
-        s.send("%s|%s" % (CLIENT_ID, msg))
+        s.connect(LOG_SOCKADDR)
+        _msg = "%s|%s\n" % (CLIENT_ID, msg)
+        for chunk in range(0, len(_msg), 16):
+            sent_bytes = s.send(_msg[chunk:chunk+16])
     except Exception as e:
         print(e)
 
@@ -174,16 +182,21 @@ def loop(_id=None, setup_fn=None, loop_fn=[], callback=None, subtopic=[]):
     CLIENT_ID = get_client_id()
     try:
         STA = setup_wifi(CLIENT_ID)
+        log('Wifi setup')
         OTA_TOPIC = ("%s/OTA" % CLIENT_ID).encode('ascii')
         mqtt = mqtt_client(MQTT_HOST, callback=OTA_wrapper(callback), subtopic=subtopic+[OTA_TOPIC])
+        log('Mqtt connected')
         if setup_fn is not None:
             setup_fn()
+        log('Setup finished')
         while True:
             if not STA.isconnected():
+                log('Reconnected wifi from main loop')
                 connect_wifi(STA)
+
             for f in loop_fn:
                 f()
-            time.sleep_ms(100)
+            time.sleep_ms(10)
             mqtt.check_msg()
         mqtt.disconnect()
     except Exception as e:
