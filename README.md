@@ -14,6 +14,20 @@ You can see more info [here](https://blog.davidventura.com.ar/iot-house-with-son
 * By providing a `HOSTNAME` file you can set your device's name. It will be used for DHCP and MQTT topics.
 
 
+# Flash initial micropython
+
+
+ESP8266
+```
+esptool.py --port /dev/ttyUSB0 erase_flash
+esptool.py --port /dev/ttyUSB0 write_flash -fs 2MB -fm dout 0x0 esp8266-20200911-v1.13.bin
+```
+
+ESP32
+```
+esptool.py --port /dev/ttyUSB0 erase_flash
+esptool.py --chip esp32 --port /dev/ttyUSB0 --baud 460800 write_flash -z 0x1000 esp32-idf4-20200902-v1.13.bin
+```
 # Pushing an OTA update
 
 Simply run `./server/OTA_sender.py --target NIGHTLAMP firmware/nightlamp/main.py --reboot` to push `main.py` to the sensor `NIGHTLAMP` and reboot it.
