@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-import configparser
-import requests
-import time
 import datetime
+import json
+
+import requests
 
 from mqtt import Mqtt
 
@@ -11,7 +11,7 @@ GRAFANA_URL = "http://db.labs:8086/write?db=sensordata"
 def setup():
     host = 'iot'
     port = 1883
-    topics = ["TEMP/TEMPSENSOR", "HUM/TEMPSENSOR", "HUM/#", "TEMP/#", "NIGHTLAMP2/state", "KINDLE/battery/state", "KINDLE/percentage/state", "phones/#", "printer/#", "LUX/state", "DESK/state"]
+    topics = ["TEMP/TEMPSENSOR", "HUM/TEMPSENSOR", "HUM/#", "TEMP/#", "NIGHTLAMP2/state", "KINDLE/#", "phones/#", "printer/#", "LUX/state", "DESK/state"]
     # CONFIG
     return Mqtt(host, port, topics, [to_influx], _json=False)
 
@@ -25,7 +25,7 @@ def main():
         pass
 
 def to_influx(topic, value):
-    custom_parsing = { 'printer': printer_parsing }
+    custom_parsing = { 'printer': printer_parsing, 'KINDLE': kindle_parsing }
     print(datetime.datetime.now(), topic, value)
     _type = topic.split('/')[0]
     if _type in custom_parsing:
@@ -37,15 +37,32 @@ def post_to_grafana(data):
         try:
             response = requests.post(GRAFANA_URL, data=data, timeout=3)
             if not response.ok:
-                print(_data)
+                print(data)
                 print(response)
                 print(response.text)
         except Exception as e:
             print(e)
 
 
+def kindle_parsing(topic, value):
+    if topic != "KINDLE/BOOK":
+        return default_parsing(topic, value)
+
+    try:
+        data = json.loads(value)
+    except Exception as e:
+        print(e)
+        return
+    page_position = int(data['pageBounds']['range']['begin'])
+    book_title = data['contentItem']['title']
+    book_length = data['contentItem']['bookLength']
+    book_percentage = (page_position / book_length)*100
+    _data = 'KINDLE,sensor=BOOK percentage=%f,book="%s"' % (float(book_percentage), book_title)
+    print(_data)
+    post_to_grafana(_data)
+
+
 def printer_parsing(topic, value):
-    _type = topic.split('/')[0]
     if topic == "printer/JOB_STATUS":
         _data = 'printer_job_status percentage=%f' % (float(value))
         post_to_grafana(_data)
