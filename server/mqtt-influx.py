@@ -57,7 +57,7 @@ def kindle_parsing(topic, value):
     book_title = data['contentItem']['title']
     book_length = data['contentItem']['bookLength']
     book_percentage = (page_position / book_length)*100
-    _data = 'KINDLE,sensor=BOOK percentage=%f,book="%s"' % (float(book_percentage), book_title)
+    _data = 'KINDLE,sensor=BOOK,book="%s" percentage=%f' % (book_title, float(book_percentage))
     print(_data)
     post_to_grafana(_data)
 
