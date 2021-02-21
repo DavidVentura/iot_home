@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
 import datetime
 import json
+import os
 
-import requests
+from influxdb_client import InfluxDBClient, Point, WritePrecision
+from influxdb_client.client.write_api import SYNCHRONOUS
 
 from mqtt import Mqtt
 
-GRAFANA_URL = "http://db.labs:8086/write?db=sensordata"
+token = os.environ['INFLUX_TOKEN']
+org = "org"
+bucket = "sensordata/autogen"
+client = InfluxDBClient(url="http://db.labs:8086", token=token)
+write_api = client.write_api(write_options=SYNCHRONOUS)
 
 def setup():
     host = 'iot'
@@ -33,13 +39,9 @@ def to_influx(topic, value):
     else:
         default_parsing(topic, value)
 
-def post_to_grafana(data):
+def post_to_influxv2(data):
         try:
-            response = requests.post(GRAFANA_URL, data=data, timeout=3)
-            if not response.ok:
-                print(data)
-                print(response)
-                print(response.text)
+            write_api.write(bucket, org, data)
         except Exception as e:
             print(e)
 
@@ -58,25 +60,25 @@ def kindle_parsing(topic, value):
     book_length = data['contentItem']['bookLength']
     book_percentage = (page_position / book_length)*100
     _data = 'KINDLE,sensor=BOOK,book=%s percentage=%f' % (book_title.replace(' ', '_'), int(book_percentage))
-    post_to_grafana(_data)
+    post_to_influxv2(_data)
 
 
 def printer_parsing(topic, value):
     if topic == "printer/JOB_STATUS":
         _data = 'printer_job_status percentage=%f' % (float(value))
-        post_to_grafana(_data)
+        post_to_influxv2(_data)
     elif topic == "printer/TEMP":
         nozzle, bed = value.split(',')
         for sensor, current, target in [['nozzle']+nozzle.split('/'), ['bed']+bed.split('/')]:
             _data = 'printer_temp,sensor=%s current=%f,target=%f' % (sensor, float(current), float(target))
-            post_to_grafana(_data)
+            post_to_influxv2(_data)
 
 
 def default_parsing(topic, value):
     _type = topic.split('/')[0]
     sensor = topic.split('/')[1]
     _data = '%s,sensor=%s value=%f' % (_type, sensor, float(value))
-    post_to_grafana(_data)
+    post_to_influxv2(_data)
     
 if __name__ == '__main__':
     main()
